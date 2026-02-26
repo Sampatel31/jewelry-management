@@ -25,6 +25,8 @@ import aiRoutes from './routes/ai.routes';
 import creditNoteRoutes from './routes/creditNote.routes';
 import debitNoteRoutes from './routes/debitNote.routes';
 import auditLogRoutes from './routes/auditLog.routes';
+import oldGoldRoutes from './routes/oldGold.routes';
+import backupRoutes from './routes/backup.routes';
 import { collectDefaultMetrics, register } from 'prom-client';
 
 collectDefaultMetrics();
@@ -111,6 +113,8 @@ app.use('/api/reports', reportsRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/audit-logs', auditLogRoutes);
+app.use('/api/old-gold', oldGoldRoutes);
+app.use('/api/backup', backupRoutes);
 
 // Health check
 app.get('/health', async (req, res) => {

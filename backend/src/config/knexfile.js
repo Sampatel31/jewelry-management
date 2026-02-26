@@ -1,6 +1,10 @@
 require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
+const path = require('path');
+const os = require('os');
 
-module.exports = {
+const dbType = process.env.DB_TYPE || 'postgres';
+
+const pgConfig = {
   client: 'postgresql',
   connection: process.env.DATABASE_URL || {
     host: process.env.DB_HOST || 'localhost',
@@ -10,11 +14,29 @@ module.exports = {
     password: process.env.DB_PASSWORD || 'jewelry_pass',
   },
   migrations: {
-    directory: require('path').join(__dirname, '../../../database/migrations'),
+    directory: path.join(__dirname, '../../../database/migrations'),
     extension: 'js',
   },
   seeds: {
-    directory: require('path').join(__dirname, '../../../database/seeds'),
+    directory: path.join(__dirname, '../../../database/seeds'),
     extension: 'js',
   },
 };
+
+const sqliteConfig = {
+  client: 'better-sqlite3',
+  connection: {
+    filename: process.env.SQLITE_PATH || path.join(os.homedir(), '.jewelry-manager', 'data.db'),
+  },
+  useNullAsDefault: true,
+  migrations: {
+    directory: path.join(__dirname, '../../../database/migrations'),
+    extension: 'js',
+  },
+  seeds: {
+    directory: path.join(__dirname, '../../../database/seeds'),
+    extension: 'js',
+  },
+};
+
+module.exports = dbType === 'sqlite' ? sqliteConfig : pgConfig;

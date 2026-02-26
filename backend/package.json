@@ -6,7 +6,9 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "migrate": "knex migrate:latest --knexfile src/config/knexfile.js",
-    "seed": "knex seed:run --knexfile src/config/knexfile.js"
+    "seed": "knex seed:run --knexfile src/config/knexfile.js",
+    "migrate:sqlite": "DB_TYPE=sqlite knex migrate:latest --knexfile src/config/knexfile.js",
+    "seed:sqlite": "DB_TYPE=sqlite knex seed:run --knexfile src/config/knexfile.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -31,8 +33,12 @@
     "xss-clean": "^0.1.4",
     "zod": "^4.3.6"
   },
+  "optionalDependencies": {
+    "better-sqlite3": "^9.4.3"
+  },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/better-sqlite3": "^7.6.10",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/hpp": "^0.2.7",

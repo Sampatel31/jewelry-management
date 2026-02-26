@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import db from '../config/db';
 import { v4 as uuidv4 } from 'uuid';
+import { auditLog } from '../utils/audit';
 
 export const getJobs = async (req: Request, res: Response) => {
   try {
@@ -9,6 +10,7 @@ export const getJobs = async (req: Request, res: Response) => {
       .join('products', 'production_jobs.product_id', 'products.id')
       .leftJoin('users', 'production_jobs.assigned_to', 'users.id')
       .select('production_jobs.*', 'products.name as product_name', 'users.name as assigned_to_name')
+      .whereNull('production_jobs.deleted_at')
       .orderBy('production_jobs.created_at', 'desc');
     if (status) query = query.where('production_jobs.status', status);
     const jobs = await query;
@@ -29,6 +31,7 @@ export const createJob = async (req: Request, res: Response) => {
       created_by: userId, created_at: new Date(), updated_at: new Date(),
     });
     const job = await db('production_jobs').where({ id }).first();
+    await auditLog({ userId, action: 'CREATE', tableName: 'production_jobs', recordId: id, newValues: job, ipAddress: req.ip });
     res.status(201).json(job);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
@@ -37,7 +40,7 @@ export const createJob = async (req: Request, res: Response) => {
 
 export const getJob = async (req: Request, res: Response) => {
   try {
-    const job = await db('production_jobs').where({ id: req.params.id }).first();
+    const job = await db('production_jobs').where({ id: req.params.id }).whereNull('deleted_at').first();
     if (!job) return res.status(404).json({ message: 'Job not found' });
     res.json(job);
   } catch (err: any) {
@@ -48,6 +51,7 @@ export const getJob = async (req: Request, res: Response) => {
 export const updateJobStatus = async (req: Request, res: Response) => {
   try {
     const { status } = req.body;
+    const userId = (req as any).user.id;
     const updates: any = { status, updated_at: new Date() };
     if (status === 'completed') {
       updates.completed_date = new Date();
@@ -58,13 +62,14 @@ export const updateJobStatus = async (req: Request, res: Response) => {
         await trx('inventory_transactions').insert({
           id: uuidv4(), product_id: job.product_id, transaction_type: 'production',
           quantity: job.quantity, reference_id: req.params.id, reference_type: 'production_job',
-          created_by: (req as any).user.id, created_at: new Date(),
+          created_by: userId, created_at: new Date(),
         });
       });
     } else {
       await db('production_jobs').where({ id: req.params.id }).update(updates);
     }
     const job = await db('production_jobs').where({ id: req.params.id }).first();
+    await auditLog({ userId, action: 'UPDATE', tableName: 'production_jobs', recordId: req.params.id, newValues: { status }, ipAddress: req.ip });
     res.json(job);
   } catch (err: any) {
     res.status(500).json({ message: err.message });

@@ -1,27 +1,34 @@
 import { Request, Response } from 'express';
 import db from '../config/db';
+import { cacheGet, cacheSet } from '../utils/cache';
 
 export const getDashboard = async (req: Request, res: Response) => {
   try {
+    const cached = await cacheGet('reports:dashboard');
+    if (cached) return res.json(JSON.parse(cached));
+
     const today = new Date().toISOString().split('T')[0];
 
     const [todaySales, totalCustomers, lowStock, pendingRepairs, recentSales] = await Promise.all([
-      db('invoices').whereRaw('DATE(created_at) = ?', [today]).sum('total_amount as total').first(),
-      db('customers').count('* as count').first(),
-      db('products').whereRaw('stock_qty <= min_stock_qty').where('is_active', true).count('* as count').first(),
-      db('repairs').whereNotIn('status', ['delivered']).count('* as count').first(),
+      db('invoices').whereRaw('DATE(created_at) = ?', [today]).whereNull('deleted_at').sum('total_amount as total').first(),
+      db('customers').whereNull('deleted_at').count('* as count').first(),
+      db('products').whereRaw('stock_qty <= min_stock_qty').where('is_active', true).whereNull('deleted_at').count('* as count').first(),
+      db('repairs').whereNotIn('status', ['delivered']).whereNull('deleted_at').count('* as count').first(),
       db('invoices').select(db.raw('DATE(created_at) as date'), db.raw('SUM(total_amount) as total'))
         .where('created_at', '>=', db.raw("NOW() - INTERVAL '30 days'"))
+        .whereNull('deleted_at')
         .groupBy(db.raw('DATE(created_at)')).orderBy('date'),
     ]);
 
-    res.json({
+    const result = {
       today_sales: Number(todaySales?.total || 0),
       total_customers: Number(totalCustomers?.count || 0),
       low_stock_count: Number(lowStock?.count || 0),
       pending_repairs: Number(pendingRepairs?.count || 0),
       sales_trend: recentSales,
-    });
+    };
+    await cacheSet('reports:dashboard', JSON.stringify(result), 60);
+    res.json(result);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }

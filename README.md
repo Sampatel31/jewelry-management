@@ -218,6 +218,23 @@ Import the Prometheus metrics into Grafana for dashboards.
 
 ## 💾 Backup & Restore
 
+### Using database/scripts (recommended)
+
+```bash
+# Create a backup manually (uses DB_ env vars)
+export DB_HOST=localhost DB_USER=jewelry_user DB_PASSWORD=jewelry_pass DB_NAME=jewelry_db
+./database/scripts/backup.sh
+# Backup saved to database/backups/backup_YYYY-MM-DD_HH-MM-SS.sql.gz (30-day retention)
+
+# Schedule daily automated backups (adds a 2 AM cron job)
+./database/scripts/schedule_backup.sh
+
+# Restore from a backup file
+./database/scripts/restore.sh database/backups/backup_2024-01-01_12-00-00.sql.gz
+```
+
+### Using backend/scripts (legacy)
+
 ```bash
 # Create a backup manually
 cd jewelry-management
@@ -230,7 +247,8 @@ docker-compose --profile backup run --rm backup
 PGPASSWORD=jewelry_pass ./backend/scripts/restore.sh /backups/backup_20240101_120000.sql.gz
 ```
 
-Backups are stored in the `backups/` directory with 7-day retention by default.
+Backups are stored in `database/backups/` with 30-day retention by default.
+The PostgreSQL Docker container also mounts `./database/backups` for persistence.
 
 ---
 

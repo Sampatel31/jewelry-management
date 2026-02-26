@@ -10,3 +10,5 @@ postgres_data/
 *.tsbuildinfo
 logs/
 backups/
+database/backups/*.sql.gz
+!database/backups/.gitkeep

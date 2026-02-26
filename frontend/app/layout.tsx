@@ -5,8 +5,8 @@ import QueryProvider from '@/components/providers/QueryProvider';
 import { ThemeProvider } from '@/context/ThemeContext';
 
 export const metadata: Metadata = {
-  title: 'JewelMS - Jewelry Management System',
-  description: 'Complete jewelry business management system',
+  title: 'Shrigar Jewellers — Management System',
+  description: 'Complete jewelry management for Shrigar Jewellers',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import { LayoutDashboard, Package, Factory, Receipt, Monitor, Users, ShoppingCart, Wrench, BarChart3, Settings, LogOut, ClipboardList, Coins, Sun, Moon } from 'lucide-react';
 import { logout, getUser } from '@/lib/auth';
 import { useTheme } from '@/context/ThemeContext';
+import { Logo } from './Logo';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: null },
@@ -35,9 +36,8 @@ export default function Sidebar() {
   return (
     <aside className="h-screen w-60 bg-dark flex flex-col fixed left-0 top-0 z-40 shadow-2xl">
       <div className="p-5 border-b border-white/10">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="text-2xl">💎</span>
-          <span className="text-xl font-bold text-amber-400">JewelMS</span>
+        <Link href="/dashboard">
+          <Logo />
         </Link>
       </div>
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">

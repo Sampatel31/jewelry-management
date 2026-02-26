@@ -8,11 +8,19 @@ export default function SettingsPage() {
   const [metalRates, setMetalRates] = useState<any[]>([]);
   const [newRate, setNewRate] = useState({ metal_type: 'gold', purity: '22k', rate_per_gram: 0, effective_date: new Date().toISOString().split('T')[0] });
   const [tab, setTab] = useState('store');
+  const [backups, setBackups] = useState<any[]>([]);
+  const [backupLoading, setBackupLoading] = useState(false);
 
   useEffect(() => {
     api.get('/settings').then(r => setSettings(r.data));
     api.get('/settings/metal-rates').then(r => setMetalRates(r.data));
   }, []);
+
+  useEffect(() => {
+    if (tab === 'backup') {
+      api.get('/backup/list').then(r => setBackups(r.data.backups || [])).catch(() => {});
+    }
+  }, [tab]);
 
   const saveSettings = async () => {
     try {
@@ -29,11 +37,27 @@ export default function SettingsPage() {
     } catch { toast.error('Failed to add rate'); }
   };
 
+  const createBackup = async () => {
+    setBackupLoading(true);
+    try {
+      const { data } = await api.get('/backup/export', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `backup-${new Date().toISOString().split('T')[0]}.sql`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success('Backup created and downloaded!');
+      api.get('/backup/list').then(r => setBackups(r.data.backups || [])).catch(() => {});
+    } catch { toast.error('Backup failed. Please try again.'); }
+    finally { setBackupLoading(false); }
+  };
+
   return (
     <div className="max-w-3xl space-y-4">
       <h1 className="text-2xl font-bold">Settings</h1>
-      <div className="flex gap-2 border-b pb-2">
-        {[['store', 'Store Info'], ['tax', 'Tax Config'], ['metal', 'Metal Rates']].map(([key, label]) => (
+      <div className="flex gap-2 border-b pb-2 flex-wrap">
+        {[['store', 'Store Info'], ['tax', 'Tax Config'], ['metal', 'Metal Rates'], ['backup', 'Backup & Restore']].map(([key, label]) => (
           <button key={key} onClick={() => setTab(key)}
             className={`px-4 py-2 text-sm font-medium rounded-t ${tab === key ? 'bg-amber-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
             {label}
@@ -105,6 +129,50 @@ export default function SettingsPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {tab === 'backup' && (
+        <div className="card space-y-6">
+          <div>
+            <h2 className="font-semibold mb-1">Create Backup</h2>
+            <p className="text-sm text-gray-500 mb-3">Download a full backup of your store data as a SQL file. Store it safely.</p>
+            <button onClick={createBackup} disabled={backupLoading} className="btn-primary">
+              {backupLoading ? 'Creating backup…' : '💾 Create Backup Now'}
+            </button>
+          </div>
+
+          <div>
+            <h2 className="font-semibold mb-3">Recent Backups</h2>
+            {backups.length === 0 ? (
+              <p className="text-sm text-gray-400">No backups found. Create your first backup above.</p>
+            ) : (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-gray-500 font-medium">
+                    <th className="pb-2 pr-4">File</th>
+                    <th className="pb-2 pr-4">Size</th>
+                    <th className="pb-2">Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {backups.slice(0, 10).map((b: any) => (
+                    <tr key={b.filename} className="border-b">
+                      <td className="py-2 pr-4 font-mono text-xs">{b.filename}</td>
+                      <td className="py-2 pr-4">{(b.size / 1024).toFixed(1)} KB</td>
+                      <td className="py-2 text-xs">{new Date(b.created_at).toLocaleString('en-IN')}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
+            <strong>Auto-backup:</strong> Automatic daily backup runs at 11 PM and saves to{' '}
+            <code className="font-mono text-xs bg-amber-100 px-1 rounded">~/ShrigarJewellers/backups/</code>.
+            Last 30 backups are retained automatically.
+          </div>
         </div>
       )}
     </div>

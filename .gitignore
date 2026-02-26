@@ -8,3 +8,5 @@ dist/
 postgres_data/
 *.node
 *.tsbuildinfo
+logs/
+backups/

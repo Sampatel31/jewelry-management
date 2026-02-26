@@ -1,7 +1,8 @@
 {
-  "name": "jewelry-manager-electron",
+  "name": "shrigar-jewellers",
+  "productName": "Shrigar Jewellers",
   "version": "1.0.0",
-  "description": "Desktop Jewelry Management System",
+  "description": "Jewelry Management System for Shrigar Jewellers",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -17,33 +18,44 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.jewelrymanager.app",
-    "productName": "Jewelry Manager",
+    "appId": "com.shrigarjewellers.management",
+    "productName": "Shrigar Jewellers",
+    "copyright": "© 2024 Shrigar Jewellers",
     "directories": {
       "output": "dist"
     },
     "files": [
       "main.js",
       "preload.js",
-      "build/**/*"
+      "splash.html",
+      "assets/**/*"
+    ],
+    "extraResources": [
+      { "from": "../backend/dist", "to": "backend/dist" },
+      { "from": "../frontend/.next", "to": "frontend/.next" },
+      { "from": "../frontend/public", "to": "frontend/public" }
     ],
     "win": {
       "target": "nsis",
-      "icon": "build/icon.ico"
+      "icon": "assets/icon.ico"
     },
     "mac": {
       "target": "dmg",
-      "icon": "build/icon.icns"
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.business"
     },
     "linux": {
       "target": "AppImage",
-      "icon": "build/icon.png"
+      "icon": "assets/icon.png"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "installerIcon": "build/icon.ico",
-      "uninstallerIcon": "build/icon.ico"
+      "installerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Shrigar Jewellers"
     }
   }
 }

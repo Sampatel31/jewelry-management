@@ -1,60 +1,76 @@
-# 💎 JewelMS — Jewelry Management System
+# 💎 Shrigar Jewellers — Management System
 
-![Node.js](https://img.shields.io/badge/Node.js-20-green?logo=node.js)
-![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?logo=postgresql)
-![Docker](https://img.shields.io/badge/Docker-Compose-blue?logo=docker)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
+![Version](https://img.shields.io/badge/Version-1.0.0-gold)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)
+![Offline](https://img.shields.io/badge/Works-100%25%20Offline-green)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
-A **production-ready, full-stack Jewelry Management System** built for real-world jewelry businesses. Manage inventory, billing, POS, customers, suppliers, production, repairs, and reports — all in one platform.
+A **complete, offline-first Jewelry Management System** built for Indian jewelry shops. Manage your entire business — billing, inventory, customers, repairs, and reports — all from a single desktop application. No internet required, no subscription fees, your data stays on your computer.
 
 ---
 
 ## ✨ Features
 
-- 🔐 **Authentication** — JWT-based login with role-based access control (Admin, Manager, Staff, Accountant)
-- 📦 **Inventory Management** — Full product CRUD with categories, barcode support, low-stock alerts
-- 🏭 **Production** — Kanban board for production jobs, Bill of Materials (BOM) editor
-- 🧾 **Billing & Invoicing** — GST-compliant invoices with PDF generation, payment tracking
-- 🖥️ **POS (Point of Sale)** — Fast POS interface with barcode search, cash/card/UPI payment, change calculator
-- 👥 **Customer Management** — Customer profiles with purchase history, loyalty points, birthday reminders
-- 🛒 **Supplier & Purchases** — Purchase orders with goods receiving workflow
-- 🔧 **Repairs** — Repair job cards with status tracking
-- 📊 **Reports & Analytics** — Sales trends, inventory valuation, top products, GST reports
-- ⚙️ **Settings** — Store configuration, tax rates, daily metal rates, user management
-- 💎 **AI Copilot** — Read-only AI assistant for inventory, sales, and operations queries
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 14, React 18, TypeScript, Tailwind CSS |
-| UI Components | shadcn/ui, Radix UI, Lucide Icons |
-| Charts | Recharts |
-| Backend | Node.js 20, Express 4, TypeScript |
-| Database | PostgreSQL 15 via Knex.js |
-| Caching | Redis 7 via ioredis (graceful degradation) |
-| Authentication | JWT (access 15m + DB-backed rotating refresh 7d) |
-| PDF Generation | PDFKit |
-| Logging | Winston + Daily Rotate File |
-| Metrics | Prometheus (prom-client) |
-| Containerization | Docker, Docker Compose |
+- 🧾 **Billing & Invoicing (GST)** — Generate GST-compliant bills/invoices with PDF, track payments
+- 🖥️ **POS (Point of Sale)** — Fast billing at the counter with barcode search, cash/card/UPI payment
+- 📦 **Inventory Management** — Products, categories, barcode support, low-stock alerts
+- 👥 **Customer Management** — Customer profiles, purchase history, loyalty points
+- 🏭 **Production / Making** — Track jewellery making jobs, Bill of Materials
+- 🔧 **Repairs** — Job cards for repair work with status tracking
+- 🛒 **Purchases & Suppliers** — Purchase orders, goods receiving workflow
+- 📊 **Reports & Analytics** — Sales trends, GST reports, inventory valuation, top products
+- 💰 **Old Gold** — Track old gold exchange transactions
+- ⚙️ **Settings** — Store details, GST config, daily gold rates, user management
+- 💾 **Auto-Backup** — Daily automatic backup at 11 PM to `~/ShrigarJewellers/backups/`
+- 🔐 **Role-Based Access** — Admin, Manager, Staff, Accountant roles
 
 ---
 
 ## 📸 Screenshots
 
-> Running on `http://localhost:3000` after `docker-compose up -d`
-
-| Dashboard | POS | Inventory |
-|-----------|-----|-----------|
-| KPI cards + charts | Full-screen sale flow | Product list with filters |
+| Dashboard | POS / Billing | Inventory |
+|-----------|---------------|-----------|
+| KPI cards + charts | Fast billing counter | Product list with filters |
 
 ---
 
-## 🚀 Quick Start (Docker)
+## 🖥️ System Requirements
+
+| Component | Minimum |
+|-----------|---------|
+| **Operating System** | Windows 10/11 (64-bit), macOS 11+, Ubuntu 20.04+ |
+| **RAM** | 4 GB (8 GB recommended) |
+| **Disk Space** | 2 GB free |
+| **Display** | 1024 × 768 minimum |
+| **Internet** | Not required after installation |
+
+---
+
+## 🚀 Installation (Desktop App)
+
+1. Download **ShrigarJewellers-Setup.exe** (Windows) or **ShrigarJewellers.dmg** (macOS)
+2. Double-click the installer
+3. Follow the setup wizard — choose install directory
+4. Launch **Shrigar Jewellers** from your Desktop or Start Menu
+5. Complete the **First-Run Setup Wizard** to configure your store
+
+---
+
+## 🏪 First Run — Setup Wizard
+
+When you open the app for the first time, a **Setup Wizard** will guide you through:
+
+1. **Welcome Screen** — Overview of the setup steps
+2. **Shop Details** — Store name, address, city, state, PIN code, phone, WhatsApp, email
+3. **Admin Account** — Create the admin login for your store
+4. **GST & Tax Details** — GSTIN, state, HSN code, CGST/SGST rates
+5. **Invoice / Bill Format** — Bill prefix (e.g. `SJ-`), starting number, footer text, bank details
+
+After setup, you will be taken directly to the dashboard.
+
+---
+
+## 🔧 Developer Setup (Docker)
 
 ```bash
 # Clone the repo
@@ -67,11 +83,10 @@ docker-compose up -d
 # Wait ~30 seconds for services to start, then open:
 # Frontend: http://localhost:3000
 # Backend API: http://localhost:5000/api/health
-# Health Check: http://localhost:5000/health
 ```
 
-**Default Credentials:**
-- Email: `admin@jewelry.com`
+**Default Credentials (development):**
+- Email: `admin@shrigarjewellers.com`
 - Password: `Admin@123`
 
 ---
@@ -81,74 +96,64 @@ docker-compose up -d
 ### Prerequisites
 - Node.js 20+
 - PostgreSQL 15+
-- Redis 7+ (optional — caching disabled gracefully if unavailable)
+- Redis 7+ (optional — caching gracefully disabled if unavailable)
 
-### 1. Database
-```bash
-# Create database
-createdb jewelry_db
-createuser jewelry_user
-psql -c "ALTER USER jewelry_user WITH PASSWORD 'jewelry_pass';"
-psql -c "GRANT ALL PRIVILEGES ON DATABASE jewelry_db TO jewelry_user;"
-```
-
-### 2. Backend
+### 1. Backend
 ```bash
 cd backend
 npm install
-
-# Configure environment
 cp ../.env.example .env
 # Edit .env with your database credentials
-
-# Run migrations and seeds
 npm run migrate
 npm run seed
-
-# Start development server
 npm run dev
 # Server runs on http://localhost:5000
 ```
 
-### 3. Frontend
+### 2. Frontend
 ```bash
 cd frontend
 npm install
-
-# Start development server
 npm run dev
 # App runs on http://localhost:3000
 ```
 
+### 3. Electron (Desktop App)
+```bash
+cd electron
+npm install
+npm start
+```
+
 ---
 
-## 🔒 Production Hardening
+## 💾 Backup & Restore
 
-### Security
-- **Helmet.js** with HSTS (max-age 1 year, includeSubDomains, preload)
-- **CORS** restricted to `ALLOWED_ORIGINS` env var (comma-separated)
-- **HPP** (HTTP Parameter Pollution) protection
-- **Rate limiting**: 500 req/15min global, 10 req/15min on login, 200 req/min on POS
-- **DB-backed JWT refresh token rotation**: 15min access tokens + 7d rotating refresh tokens stored as SHA-256 hashes
-- **Password strength** validation: uppercase + lowercase + number + special character required
-- **Zod validation** middleware on all 13 route groups
-- **Soft deletes** (`deleted_at`) on products, customers, suppliers, invoices, production_jobs, repairs
-- **Invoices DELETE → 405** — invoices cannot be hard-deleted
+### Automatic Backups
+Daily backups run automatically at **11 PM** and are saved to:
+```
+~/ShrigarJewellers/backups/backup-YYYY-MM-DD.sql
+```
+Last 30 backups are kept automatically.
 
-### Observability
-- **Winston** structured JSON logging with daily log rotation (`logs/` directory)
-- **Request logger** middleware: method, URL, status, latency, user ID
-- **Audit logs** table: all CUD operations logged with old/new values and IP address
-- **`GET /health`** — DB ping, uptime, latency, degraded status (no auth required)
-- **`GET /metrics`** — Prometheus format via prom-client (protected by `x-metrics-token` header)
+### Manual Backup
+- Open the app → Settings → **Backup & Restore** → "Create Backup Now"
+- Or via system tray → "Create Backup Now"
 
-### Resilience
-- **Knex transactions** on all multi-table writes: `createInvoice`, `completeSale`, `receiveGoods`, `completeJob`
-- **Retry utility** (`backend/src/utils/retry.ts`) with exponential backoff for transient DB errors
-- **Redis caching** with graceful degradation if Redis is unavailable:
-  - Products, categories, dashboard: 60s TTL
-  - Settings, metal rates: 300s TTL
-  - Cache invalidated on mutations
+### Restore
+```bash
+psql -U jewelry_user -d jewelry_db < ~/ShrigarJewellers/backups/backup-2024-01-01.sql
+```
+
+---
+
+## 🔒 Security & Privacy
+
+- **100% Offline** — No internet required, no data leaves your computer
+- **Your data belongs to you** — See [DATA_OWNERSHIP.md](DATA_OWNERSHIP.md)
+- **JWT authentication** — 15-minute access tokens + rotating refresh tokens
+- **Role-based access control** — Admin, Manager, Staff, Accountant
+- **Audit logs** — All changes tracked with user and timestamp
 
 ---
 
@@ -156,141 +161,33 @@ npm run dev
 
 Base URL: `http://localhost:5000/api`
 
-All protected routes require: `Authorization: Bearer <token>`
-
 | Module | Endpoints |
 |--------|-----------|
-| Auth | `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me` |
-| Products | `GET/POST /products`, `GET/PUT/DELETE /products/:id`, `GET /products/barcode/:barcode` |
-| Categories | `GET/POST /categories`, `PUT/DELETE /categories/:id` |
-| Inventory | `POST /inventory/adjust`, `GET /inventory/transactions`, `GET /inventory/low-stock` |
-| Customers | `GET/POST /customers`, `GET/PUT/DELETE /customers/:id`, `GET /customers/:id/invoices` |
-| Suppliers | `GET/POST /suppliers`, `GET/PUT/DELETE /suppliers/:id` |
-| Purchases | `GET/POST /purchases/orders`, `GET /purchases/orders/:id`, `PUT /purchases/orders/:id/receive` |
-| Billing | `GET/POST /billing/invoices`, `GET /billing/invoices/:id`, `POST /billing/invoices/:id/payment`, `GET /billing/invoices/:id/pdf` |
+| Auth | `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout` |
+| Products | `GET/POST /products`, `GET/PUT/DELETE /products/:id` |
+| Billing | `GET/POST /billing/invoices`, `GET /billing/invoices/:id/pdf` |
 | POS | `POST /pos/sale`, `GET /pos/search` |
-| Production | `GET/POST /production/jobs`, `PUT /production/jobs/:id/status`, `GET/POST /production/bom` |
-| Repairs | `GET/POST /repairs`, `GET/PUT /repairs/:id`, `PUT /repairs/:id/status` |
-| Reports | `GET /reports/dashboard`, `GET /reports/sales`, `GET /reports/gst`, `GET /reports/top-products` |
-| Settings | `GET/PUT /settings`, `GET/POST /settings/metal-rates`, `GET/POST/PUT /settings/users` |
-| AI | `POST /ai/chat` |
-| Health | `GET /health` (no auth) |
-| Metrics | `GET /metrics` (requires `x-metrics-token` header) |
+| Customers | `GET/POST /customers`, `GET/PUT/DELETE /customers/:id` |
+| Reports | `GET /reports/dashboard`, `GET /reports/sales`, `GET /reports/gst` |
+| Settings | `GET/PUT /settings`, `GET/POST /settings/metal-rates` |
+| Backup | `GET /backup/export`, `GET /backup/list` |
+| Health | `GET /health` (no auth required) |
 
 ---
 
-## 🗄️ Environment Variables
+## 📜 Legal
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | — |
-| `JWT_SECRET` | JWT signing secret | — |
-| `JWT_REFRESH_SECRET` | JWT refresh token secret | — |
-| `JWT_EXPIRES_IN` | Access token expiry | `15m` |
-| `JWT_REFRESH_EXPIRES_IN` | Refresh token expiry | `7d` |
-| `PORT` | Backend server port | `5000` |
-| `NODE_ENV` | Environment | `development` |
-| `ALLOWED_ORIGINS` | Comma-separated allowed CORS origins | `*` |
-| `REDIS_URL` | Redis connection URL (optional) | — |
-| `METRICS_TOKEN` | Token for `/metrics` endpoint | — |
-| `OPENAI_API_KEY` | OpenAI key (optional — rule-based fallback if absent) | — |
-| `LOG_LEVEL` | Winston log level | `info` |
-| `NEXT_PUBLIC_API_URL` | Frontend API base URL | `http://localhost:5000/api` |
+- [LICENSE](LICENSE) — MIT License
+- [PRIVACY_POLICY.md](PRIVACY_POLICY.md) — How your data is handled
+- [TERMS_OF_SERVICE.md](TERMS_OF_SERVICE.md) — Terms of use
+- [DATA_OWNERSHIP.md](DATA_OWNERSHIP.md) — Your data rights
 
 ---
 
-## 📊 Monitoring
+## 📞 Support
 
-### Health Check
-```bash
-curl http://localhost:5000/health
-# {"status":"ok","db":"ok","uptime":123.4,"dbLatencyMs":2,"timestamp":"..."}
-```
-
-### Prometheus Metrics
-```bash
-curl -H "x-metrics-token: your-token" http://localhost:5000/metrics
-```
-
-Import the Prometheus metrics into Grafana for dashboards.
+**Email:** support@shrigarjewellers.com
 
 ---
 
-## 💾 Backup & Restore
-
-### Using database/scripts (recommended)
-
-```bash
-# Create a backup manually (uses DB_ env vars)
-export DB_HOST=localhost DB_USER=jewelry_user DB_PASSWORD=jewelry_pass DB_NAME=jewelry_db
-./database/scripts/backup.sh
-# Backup saved to database/backups/backup_YYYY-MM-DD_HH-MM-SS.sql.gz (30-day retention)
-
-# Schedule daily automated backups (adds a 2 AM cron job)
-./database/scripts/schedule_backup.sh
-
-# Restore from a backup file
-./database/scripts/restore.sh database/backups/backup_2024-01-01_12-00-00.sql.gz
-```
-
-### Using backend/scripts (legacy)
-
-```bash
-# Create a backup manually
-cd jewelry-management
-PGPASSWORD=jewelry_pass ./backend/scripts/backup.sh
-
-# Run backup via Docker Compose (one-off)
-docker-compose --profile backup run --rm backup
-
-# Restore from a backup file
-PGPASSWORD=jewelry_pass ./backend/scripts/restore.sh /backups/backup_20240101_120000.sql.gz
-```
-
-Backups are stored in `database/backups/` with 30-day retention by default.
-The PostgreSQL Docker container also mounts `./database/backups` for persistence.
-
----
-
-## 💎 AI Assistant
-
-The AI Copilot (💎 button, bottom-right) provides a read-only interface to query your jewelry store data using natural language.
-
-- **Role-filtered context**: admins see revenue/user metrics; staff see only inventory summaries
-- **Read-only**: the AI cannot modify any data
-- **OpenAI integration**: uses `gpt-4o-mini` if `OPENAI_API_KEY` is set; falls back to rule-based responses otherwise
-- **All interactions are logged** to the `ai_interaction_logs` table for auditing
-
----
-
-## 📋 Project Structure
-
-```
-jewelry-management/
-├── frontend/                   # Next.js 14 app
-│   ├── components/
-│   │   ├── ai/AICopilot.tsx    # AI Copilot chat panel
-│   │   ├── ErrorBoundary.tsx   # React error boundary
-│   │   └── layout/             # Dashboard layout
-│   └── lib/api.ts              # Axios client with refresh rotation
-├── backend/
-│   ├── src/
-│   │   ├── controllers/        # 14 route controllers
-│   │   ├── middleware/         # Auth, RBAC, error handler, request logger
-│   │   ├── routes/             # 14 route files
-│   │   ├── utils/              # logger, audit, cache, retry, aiSafety, AppError
-│   │   └── validators/         # Zod schemas for all routes
-│   └── scripts/                # backup.sh, restore.sh
-├── database/
-│   ├── migrations/             # 22 Knex migration files
-│   └── seeds/                  # Sample data seeds
-├── docker-compose.yml          # PostgreSQL + Redis + Backend + Frontend + Backup
-├── .env.example
-└── README.md
-```
-
----
-
-## 📜 License
-
-MIT License — feel free to use for commercial projects.
+© 2024 Shrigar Jewellers. All rights reserved.

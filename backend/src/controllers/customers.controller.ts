@@ -79,12 +79,28 @@ export const getUpcomingBirthdays = async (req: Request, res: Response) => {
     const today = new Date();
     const in30 = new Date(today);
     in30.setDate(today.getDate() + 30);
-    const customers = await db('customers')
-      .whereNotNull('birthday')
-      .whereRaw(`EXTRACT(MONTH FROM birthday) * 100 + EXTRACT(DAY FROM birthday) 
-        BETWEEN ? AND ?`,
-        [today.getMonth() * 100 + today.getDate(), in30.getMonth() * 100 + in30.getDate()])
-      .select('*');
+    // Use MMDD integer comparison; handle year-end wraparound (e.g. Dec 20 → Jan 19)
+    const todayMMDD = (today.getMonth() + 1) * 100 + today.getDate();
+    const in30MMDD = (in30.getMonth() + 1) * 100 + in30.getDate();
+    let customers;
+    if (todayMMDD <= in30MMDD) {
+      customers = await db('customers')
+        .whereNotNull('birthday')
+        .whereRaw(
+          `EXTRACT(MONTH FROM birthday)::int * 100 + EXTRACT(DAY FROM birthday)::int BETWEEN ? AND ?`,
+          [todayMMDD, in30MMDD]
+        )
+        .select('*');
+    } else {
+      // Wraps around year end
+      customers = await db('customers')
+        .whereNotNull('birthday')
+        .whereRaw(
+          `EXTRACT(MONTH FROM birthday)::int * 100 + EXTRACT(DAY FROM birthday)::int >= ? OR EXTRACT(MONTH FROM birthday)::int * 100 + EXTRACT(DAY FROM birthday)::int <= ?`,
+          [todayMMDD, in30MMDD]
+        )
+        .select('*');
+    }
     res.json(customers);
   } catch (err: any) {
     res.status(500).json({ message: err.message });

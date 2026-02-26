@@ -8,7 +8,9 @@
     "migrate": "knex migrate:latest --knexfile src/config/knexfile.js",
     "seed": "knex seed:run --knexfile src/config/knexfile.js",
     "migrate:sqlite": "DB_TYPE=sqlite knex migrate:latest --knexfile src/config/knexfile.js",
-    "seed:sqlite": "DB_TYPE=sqlite knex seed:run --knexfile src/config/knexfile.js"
+    "seed:sqlite": "DB_TYPE=sqlite knex seed:run --knexfile src/config/knexfile.js",
+    "lint": "eslint src --ext .ts",
+    "test": "jest --passWithNoTests"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -48,6 +50,12 @@
     "@types/pdfkit": "^0.13.4",
     "@types/uuid": "^9.0.8",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.3",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.12",
+    "ts-jest": "^29.1.4"
   }
 }

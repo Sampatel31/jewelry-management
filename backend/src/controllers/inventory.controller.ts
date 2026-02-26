@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
 import db from '../config/db';
 import { v4 as uuidv4 } from 'uuid';
+import { auditLog } from '../utils/audit';
 
 export const adjustStock = async (req: Request, res: Response) => {
   try {
     const { product_id, quantity, transaction_type, notes } = req.body;
     const userId = (req as any).user.id;
+    const old = await db('products').where({ id: product_id }).first();
     await db.transaction(async (trx) => {
       await trx('inventory_transactions').insert({
         id: uuidv4(), product_id, transaction_type: transaction_type || 'adjustment',
@@ -13,6 +15,8 @@ export const adjustStock = async (req: Request, res: Response) => {
       });
       await trx('products').where({ id: product_id }).increment('stock_qty', quantity);
     });
+    const updated = await db('products').where({ id: product_id }).first();
+    await auditLog({ userId, action: 'UPDATE', tableName: 'products', recordId: product_id, oldValues: { stock_qty: old?.stock_qty }, newValues: { stock_qty: updated?.stock_qty, adjustment: quantity }, ipAddress: req.ip });
     res.json({ message: 'Stock adjusted' });
   } catch (err: any) {
     res.status(500).json({ message: err.message });

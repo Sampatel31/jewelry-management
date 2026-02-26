@@ -1,8 +1,30 @@
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 import db from '../config/db';
 import { v4 as uuidv4 } from 'uuid';
 import { calculateInvoiceTotals } from '../utils/gst';
 import { generateInvoicePDF } from '../utils/invoice';
+import { auditLog } from '../utils/audit';
+
+const FINALIZED = 'finalized';
+
+function computeInvoiceHash(invoice: any, items: any[]): string {
+  const payload = {
+    invoice_number: invoice.invoice_number,
+    customer_id: invoice.customer_id,
+    invoice_date: invoice.invoice_date,
+    total_amount: invoice.total_amount,
+    cgst_amount: invoice.cgst_amount,
+    sgst_amount: invoice.sgst_amount,
+    items: items.map((i: any) => ({
+      product_id: i.product_id,
+      quantity: i.quantity,
+      unit_price: i.unit_price,
+      total_price: i.total_price,
+    })),
+  };
+  return crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex');
+}
 
 export const createInvoice = async (req: Request, res: Response) => {
   try {
@@ -36,6 +58,7 @@ export const createInvoice = async (req: Request, res: Response) => {
     });
 
     const invoice = await db('invoices').where({ id }).first();
+    await auditLog({ userId, action: 'CREATE', tableName: 'invoices', recordId: id, newValues: invoice, ipAddress: req.ip });
     res.status(201).json(invoice);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
@@ -75,9 +98,29 @@ export const getInvoice = async (req: Request, res: Response) => {
 
 export const updateInvoice = async (req: Request, res: Response) => {
   try {
-    await db('invoices').where({ id: req.params.id }).update({ ...req.body, updated_at: new Date() });
     const invoice = await db('invoices').where({ id: req.params.id }).first();
-    res.json(invoice);
+    if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
+    if (invoice.finalization_status === FINALIZED) {
+      return res.status(403).json({ message: 'Invoice is finalized and cannot be modified' });
+    }
+    const old = { ...invoice };
+    const updates: any = { ...req.body, updated_at: new Date() };
+
+    // If finalizing, compute and store hash
+    if (req.body.finalization_status === FINALIZED) {
+      const items = await db('invoice_items').where({ invoice_id: req.params.id });
+      const merged = { ...invoice, ...req.body };
+      updates.invoice_hash = computeInvoiceHash(merged, items);
+    }
+
+    await db('invoices').where({ id: req.params.id }).update(updates);
+    const updated = await db('invoices').where({ id: req.params.id }).first();
+    const userId = (req as any).user?.id;
+    await auditLog({ userId, action: 'UPDATE', tableName: 'invoices', recordId: req.params.id, oldValues: old, newValues: updated, ipAddress: req.ip });
+    if (req.body.finalization_status === FINALIZED) {
+      await auditLog({ userId, action: 'UPDATE', tableName: 'invoices', recordId: req.params.id, newValues: { event: 'INVOICE_FINALIZED', invoice_hash: updates.invoice_hash }, ipAddress: req.ip });
+    }
+    res.json(updated);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }

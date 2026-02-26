@@ -66,7 +66,11 @@ export const exportBackup = async (req: Request, res: Response) => {
       await auditLog({ userId, action: 'EXPORT', tableName: 'backup', recordId: 'postgres', ipAddress: req.ip });
     }
   } catch (err: any) {
-    res.status(500).json({ message: `Backup export failed: ${err.message}` });
+    // Sanitize error message to avoid leaking credentials
+    const safeMessage = (err.message || 'Unknown error')
+      .replace(/postgresql:\/\/[^\s]+/gi, 'postgresql://[REDACTED]')
+      .replace(/password=[^\s&]+/gi, 'password=[REDACTED]');
+    res.status(500).json({ message: `Backup export failed: ${safeMessage}` });
   }
 };
 

@@ -3,7 +3,7 @@ import logger from './logger';
 
 interface AuditParams {
   userId: string;
-  action: 'CREATE' | 'UPDATE' | 'DELETE';
+  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'EXPORT' | 'IMPORT';
   tableName: string;
   recordId: string;
   oldValues?: object | null;

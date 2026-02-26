@@ -2,8 +2,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
-import { LayoutDashboard, Package, Factory, Receipt, Monitor, Users, ShoppingCart, Wrench, BarChart3, Settings, LogOut, ClipboardList } from 'lucide-react';
+import { LayoutDashboard, Package, Factory, Receipt, Monitor, Users, ShoppingCart, Wrench, BarChart3, Settings, LogOut, ClipboardList, Coins, Sun, Moon } from 'lucide-react';
 import { logout, getUser } from '@/lib/auth';
+import { useTheme } from '@/context/ThemeContext';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: null },
@@ -14,6 +15,7 @@ const navItems = [
   { href: '/customers', icon: Users, label: 'Customers', roles: null },
   { href: '/purchases', icon: ShoppingCart, label: 'Purchases', roles: null },
   { href: '/repairs', icon: Wrench, label: 'Repairs', roles: null },
+  { href: '/old-gold', icon: Coins, label: 'Old Gold', roles: ['admin', 'manager', 'staff'] },
   { href: '/reports', icon: BarChart3, label: 'Reports', roles: ['admin', 'manager', 'accountant'] },
   { href: '/audit-logs', icon: ClipboardList, label: 'Audit Logs', roles: ['admin', 'accountant'] },
   { href: '/settings', icon: Settings, label: 'Settings', roles: null },
@@ -23,6 +25,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const user = getUser();
   const role = user?.role || '';
+  const { theme, toggleTheme } = useTheme();
 
   const visibleItems = useMemo(
     () => navItems.filter(item => !item.roles || item.roles.includes(role)),
@@ -45,7 +48,15 @@ export default function Sidebar() {
           </Link>
         ))}
       </nav>
-      <div className="p-4 border-t border-white/10">
+      <div className="p-4 border-t border-white/10 space-y-1">
+        <button
+          onClick={toggleTheme}
+          className="sidebar-link w-full text-left text-gray-300 hover:text-white"
+          title="Toggle dark/light mode"
+        >
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+        </button>
         <button onClick={logout} className="sidebar-link w-full text-left text-red-400 hover:text-red-300 hover:bg-red-400/10">
           <LogOut size={18} />
           <span>Logout</span>

@@ -5,8 +5,34 @@ import { v4 as uuidv4 } from 'uuid';
 import { calculateInvoiceTotals } from '../utils/gst';
 import { generateInvoicePDF } from '../utils/invoice';
 import { auditLog } from '../utils/audit';
+import { generateFinancialYearInvoiceNumber } from '../utils/goldPricing';
 
 const FINALIZED = 'finalized';
+
+async function getNextInvoiceSerial(trx: any): Promise<{ invoiceNumber: string; financialYear: string; serial: number }> {
+  const prefixSetting = await trx('settings').where({ key: 'invoice_prefix' }).first();
+  const startMonthSetting = await trx('settings').where({ key: 'invoice_fy_start_month' }).first();
+  const prefix = prefixSetting?.value || process.env.INVOICE_PREFIX || 'INV';
+  const startMonth = parseInt(startMonthSetting?.value || process.env.INVOICE_FINANCIAL_YEAR_START_MONTH || '4', 10);
+
+  // Determine financial year
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+  const fyStart = month < startMonth ? year - 1 : year;
+  const fyEnd = (fyStart + 1).toString().slice(2);
+  const financialYear = `${fyStart}-${fyEnd}`;
+
+  // Get last serial for this financial year
+  const last = await trx('invoices')
+    .where({ financial_year: financialYear })
+    .orderBy('serial_number', 'desc')
+    .first();
+  const serial = (last?.serial_number || 0) + 1;
+  const { invoiceNumber } = generateFinancialYearInvoiceNumber(prefix, serial, startMonth);
+  return { invoiceNumber, financialYear, serial };
+}
+
 
 function computeInvoiceHash(invoice: any, items: any[]): string {
   const payload = {
@@ -35,8 +61,21 @@ export const createInvoice = async (req: Request, res: Response) => {
     const totals = calculateInvoiceTotals(items, invoiceData.discount_amount || 0);
 
     await db.transaction(async (trx) => {
+      // Generate financial-year invoice number if not provided
+      let invoiceNumber = invoiceData.invoice_number;
+      let financialYear: string | undefined;
+      let serialNumber: number | undefined;
+      if (!invoiceNumber) {
+        const serial = await getNextInvoiceSerial(trx);
+        invoiceNumber = serial.invoiceNumber;
+        financialYear = serial.financialYear;
+        serialNumber = serial.serial;
+      }
+
       await trx('invoices').insert({
-        id, ...invoiceData, ...totals, created_by: userId,
+        id, ...invoiceData, ...totals, invoice_number: invoiceNumber,
+        financial_year: financialYear, serial_number: serialNumber,
+        created_by: userId,
         created_at: new Date(), updated_at: new Date(),
       });
 

@@ -1,9 +1,30 @@
-# 💎 Shrigar Jewellers — Management System
+# 💎 JewelMS — Shrigar Jewellers Management System
+
+> **Free Desktop App for Indian Jewelry Shops** — No subscription, no cloud, your data stays with you.
+
+[![Download for Windows](https://img.shields.io/badge/Download-Windows%20.exe-blue?style=for-the-badge&logo=windows)](https://github.com/Sampatel31/jewelry-management/releases/latest)
+[![Download for macOS](https://img.shields.io/badge/Download-macOS%20.dmg-black?style=for-the-badge&logo=apple)](https://github.com/Sampatel31/jewelry-management/releases/latest)
+[![Download for Linux](https://img.shields.io/badge/Download-Linux%20.AppImage-orange?style=for-the-badge&logo=linux)](https://github.com/Sampatel31/jewelry-management/releases/latest)
 
 ![Version](https://img.shields.io/badge/Version-1.0.0-gold)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)
 ![Offline](https://img.shields.io/badge/Works-100%25%20Offline-green)
 ![License](https://img.shields.io/badge/License-MIT-blue)
+![CI](https://github.com/Sampatel31/jewelry-management/actions/workflows/ci.yml/badge.svg)
+
+---
+
+## ⬇️ Download
+
+| Platform | Download |
+|----------|----------|
+| **Windows 10/11** | [ShrigarJewellers-Setup.exe](https://github.com/Sampatel31/jewelry-management/releases/latest) |
+| **macOS 11+** | [ShrigarJewellers.dmg](https://github.com/Sampatel31/jewelry-management/releases/latest) |
+| **Linux** | [ShrigarJewellers.AppImage](https://github.com/Sampatel31/jewelry-management/releases/latest) |
+
+All releases are built automatically by GitHub Actions and are free to download.
+
+---
 
 A **complete, offline-first Jewelry Management System** built for Indian jewelry shops. Manage your entire business — billing, inventory, customers, repairs, and reports — all from a single desktop application. No internet required, no subscription fees, your data stays on your computer.
 
@@ -28,9 +49,19 @@ A **complete, offline-first Jewelry Management System** built for Indian jewelry
 
 ## 📸 Screenshots
 
+> **Add real screenshots here** — replace the placeholders with actual app screenshots after first run.
+
 | Dashboard | POS / Billing | Inventory |
 |-----------|---------------|-----------|
-| KPI cards + charts | Fast billing counter | Product list with filters |
+| ![Dashboard](docs/screenshots/dashboard.png) | ![POS](docs/screenshots/pos.png) | ![Inventory](docs/screenshots/inventory.png) |
+| KPI cards + sales charts | Fast billing counter | Product list with filters |
+
+| Repairs | Settings | Reports |
+|---------|----------|---------|
+| ![Repairs](docs/screenshots/repairs.png) | ![Settings](docs/screenshots/settings.png) | ![Reports](docs/screenshots/reports.png) |
+| Job card Kanban | GST & store config | Sales & GST reports |
+
+*To add screenshots: take a screenshot of the running app, save to `docs/screenshots/` and commit.*
 
 ---
 
@@ -85,9 +116,11 @@ docker-compose up -d
 # Backend API: http://localhost:5000/api/health
 ```
 
-**Default Credentials (development):**
+**Default Credentials (development only):**
 - Email: `admin@shrigarjewellers.com`
 - Password: `Admin@123`
+
+> ⚠️ **Note:** On first login, the setup wizard forces a mandatory password change. Default credentials are not shown on the login screen in production builds.
 
 ---
 
@@ -163,15 +196,44 @@ Base URL: `http://localhost:5000/api`
 
 | Module | Endpoints |
 |--------|-----------|
-| Auth | `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout` |
+| Auth | `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `PUT /auth/change-password` |
 | Products | `GET/POST /products`, `GET/PUT/DELETE /products/:id` |
 | Billing | `GET/POST /billing/invoices`, `GET /billing/invoices/:id/pdf` |
 | POS | `POST /pos/sale`, `GET /pos/search` |
 | Customers | `GET/POST /customers`, `GET/PUT/DELETE /customers/:id` |
 | Reports | `GET /reports/dashboard`, `GET /reports/sales`, `GET /reports/gst` |
 | Settings | `GET/PUT /settings`, `GET/POST /settings/metal-rates` |
-| Backup | `GET /backup/export`, `GET /backup/list` |
+| Backup | `POST /backup/create`, `GET /backup/list`, `GET /backup/download/:filename`, `GET /backup/export` |
 | Health | `GET /health` (no auth required) |
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! This is a free, open-source tool for Indian jewelry shop owners.
+
+### Getting Started
+
+1. **Fork** the repository on GitHub
+2. **Clone** your fork: `git clone https://github.com/<your-username>/jewelry-management`
+3. **Create a branch**: `git checkout -b feature/your-feature-name`
+4. **Make changes** following the existing code style
+5. **Test** your changes: `npm test` in `backend/` and `npm run build` in `frontend/`
+6. **Commit**: `git commit -m "feat: describe your change"`
+7. **Push** and open a **Pull Request**
+
+### Code Style
+
+- **Backend**: TypeScript, Express, Knex.js — follow existing controller/route patterns
+- **Frontend**: Next.js 14 App Router, Tailwind CSS, `@tanstack/react-query`
+- **Commits**: Use [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, etc.)
+
+### Reporting Issues
+
+Open an issue on GitHub with:
+- Steps to reproduce
+- Expected vs actual behaviour
+- Your OS and app version
 
 ---
 
@@ -188,6 +250,8 @@ Base URL: `http://localhost:5000/api`
 
 **Email:** support@shrigarjewellers.com
 
+> **First-run note:** The setup wizard forces a password change on first login. The default admin credentials are not shown on the login screen — contact your administrator for access.
+
 ---
 
-© 2024 Shrigar Jewellers. All rights reserved.
+© 2025 JewelMS / Shrigar Jewellers. All rights reserved.

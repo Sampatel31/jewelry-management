@@ -25,32 +25,30 @@
     "directories": {
       "output": "dist"
     },
-    "files": ["dist/**/*", "electron/**/*", "assets/**/*", "main.js", "preload.js", "splash.html"],
+    "files": [
+      "main.js",
+      "preload.js",
+      "splash.html",
+      "assets/**/*"
+    ],
     "extraResources": [
       { "from": "../backend/dist", "to": "backend/dist" },
       { "from": "../frontend/.next", "to": "frontend/.next" },
-      { "from": "../frontend/public", "to": "frontend/public" },
-      { "from": "database/", "to": "database/" }
+      { "from": "../frontend/public", "to": "frontend/public" }
     ],
     "win": {
-      "target": ["nsis"],
-      "icon": "assets/icon.ico"
+      "target": ["nsis"]
     },
     "mac": {
       "target": ["dmg"],
-      "icon": "assets/icon.icns",
       "category": "public.app-category.business"
     },
     "linux": {
-      "target": ["AppImage", "deb"],
-      "icon": "assets/icon.png"
+      "target": ["AppImage", "deb"]
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "installerIcon": "assets/icon.ico",
-      "installerHeader": "assets/installerHeader.bmp",
-      "license": "LICENSE",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "JewelMS"

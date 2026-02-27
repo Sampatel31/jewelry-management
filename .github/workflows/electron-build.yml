@@ -7,6 +7,7 @@ on:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
@@ -25,16 +26,22 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: http://localhost:5000/api
 
+      - name: Ensure frontend/public exists
+        run: mkdir -p frontend/public
+
       - name: Install & Build Backend
         working-directory: backend
         run: npm ci && npm run build
 
       - name: Build Electron
         working-directory: electron
-        run: npm ci && npm run dist
+        run: npm install && npm run dist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: JewelMS-${{ matrix.os }}
           path: electron/dist/
+          if-no-files-found: warn

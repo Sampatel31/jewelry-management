@@ -5,8 +5,8 @@ import { login } from '@/lib/auth';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('admin@jewelry.com');
-  const [password, setPassword] = useState('Admin@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -14,9 +14,13 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await login(email, password);
+      const result = await login(email, password);
       toast.success('Login successful!');
-      router.push('/dashboard');
+      if ((result as any)?.user?.must_change_password) {
+        router.push('/change-password');
+      } else {
+        router.push('/dashboard');
+      }
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Login failed');
     } finally {
@@ -40,7 +44,7 @@ export default function LoginPage() {
               <input
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-400"
-                placeholder="admin@jewelry.com" required
+                placeholder="Enter your email" required
               />
             </div>
             <div>
@@ -59,7 +63,7 @@ export default function LoginPage() {
             </button>
           </form>
           <p className="mt-4 text-center text-sm text-gray-500">
-            Default: admin@jewelry.com / Admin@123
+            Contact your administrator for login credentials
           </p>
         </div>
       </div>

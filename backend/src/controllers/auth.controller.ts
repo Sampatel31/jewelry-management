@@ -35,7 +35,7 @@ export const login = async (req: Request, res: Response) => {
       created_at: new Date(),
     }).catch(() => {}); // graceful - table may not exist yet
 
-    res.json({ token, refreshToken, user: payload });
+    res.json({ token, refreshToken, user: { ...payload, must_change_password: !!user.must_change_password } });
   } catch (err: any) {
     logger.error('login_error', { err });
     res.status(500).json({ message: err.message });
@@ -131,7 +131,9 @@ export const changePassword = async (req: Request, res: Response) => {
     const valid = await bcrypt.compare(currentPassword, user.password_hash);
     if (!valid) return res.status(400).json({ message: 'Current password incorrect' });
     const hash = await bcrypt.hash(newPassword, 12);
-    await db('users').where({ id: userId }).update({ password_hash: hash });
+    await db('users').where({ id: userId }).update({ password_hash: hash, must_change_password: false });
+    // Invalidate all refresh tokens for this user
+    await db('refresh_tokens').where({ user_id: userId }).update({ revoked: true, revoked_at: new Date() }).catch(() => {});
     await auditLog({
       userId,
       action: 'UPDATE',

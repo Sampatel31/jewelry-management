@@ -154,6 +154,8 @@ function createTray() {
     { label: 'Create Backup Now', click: () => runAutoBackup() },
     { label: 'Open Backups Folder', click: () => shell.openPath(BACKUP_DIR) },
     { type: 'separator' },
+    { label: 'Check for Updates', click: () => checkForUpdates() },
+    { type: 'separator' },
     { label: 'Quit', click: () => app.quit() },
   ]);
 
@@ -215,6 +217,31 @@ function scheduleAutoBackup() {
     }, delay);
   };
   scheduleNext();
+}
+
+// ─── Update Check ─────────────────────────────────────────────────────────────
+function checkForUpdates() {
+  const RELEASES_URL = 'https://api.github.com/repos/Sampatel31/jewelry-management/releases/latest';
+  http.get(RELEASES_URL, { headers: { 'User-Agent': `JewelMS/${app.getVersion()}` } }, (res) => {
+    let body = '';
+    res.on('data', (chunk) => { body += chunk; });
+    res.on('end', () => {
+      try {
+        const release = JSON.parse(body);
+        const latest = release.tag_name ? release.tag_name.replace(/^v/, '') : null;
+        const current = app.getVersion();
+        if (latest && latest !== current && mainWindow) {
+          mainWindow.webContents.executeJavaScript(
+            `window.__jewel_update_available = { version: '${latest}', url: '${release.html_url}' };`
+          ).catch(() => {});
+        }
+      } catch {
+        // Ignore parse errors
+      }
+    });
+  }).on('error', () => {
+    // Ignore network errors — app works fully offline
+  });
 }
 
 // ─── Child Processes ─────────────────────────────────────────────────────────
@@ -292,6 +319,7 @@ app.whenReady().then(async () => {
 
   createMainWindow();
   scheduleAutoBackup();
+  checkForUpdates();
 });
 
 // macOS: re-create window when dock icon is clicked

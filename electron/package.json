@@ -1,11 +1,12 @@
 {
   "name": "shrigar-jewellers",
-  "productName": "Shrigar Jewellers",
+  "productName": "JewelMS",
   "version": "1.0.0",
   "description": "Jewelry Management System for Shrigar Jewellers",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "dist": "electron-builder",
     "build:win": "electron-builder --win",
     "build:mac": "electron-builder --mac",
     "build:linux": "electron-builder --linux"
@@ -18,44 +19,41 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.shrigarjewellers.management",
-    "productName": "Shrigar Jewellers",
-    "copyright": "© 2024 Shrigar Jewellers",
+    "appId": "com.shrigar.jewelms",
+    "productName": "JewelMS",
+    "copyright": "Copyright © 2025 JewelMS",
     "directories": {
       "output": "dist"
     },
-    "files": [
-      "main.js",
-      "preload.js",
-      "splash.html",
-      "assets/**/*"
-    ],
+    "files": ["dist/**/*", "electron/**/*", "assets/**/*", "main.js", "preload.js", "splash.html"],
     "extraResources": [
       { "from": "../backend/dist", "to": "backend/dist" },
       { "from": "../frontend/.next", "to": "frontend/.next" },
-      { "from": "../frontend/public", "to": "frontend/public" }
+      { "from": "../frontend/public", "to": "frontend/public" },
+      { "from": "database/", "to": "database/" }
     ],
     "win": {
-      "target": "nsis",
+      "target": ["nsis"],
       "icon": "assets/icon.ico"
     },
     "mac": {
-      "target": "dmg",
+      "target": ["dmg"],
       "icon": "assets/icon.icns",
       "category": "public.app-category.business"
     },
     "linux": {
-      "target": "AppImage",
+      "target": ["AppImage", "deb"],
       "icon": "assets/icon.png"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "installerIcon": "assets/icon.ico",
-      "installerHeaderIcon": "assets/icon.ico",
+      "installerHeader": "assets/installerHeader.bmp",
+      "license": "LICENSE",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Shrigar Jewellers"
+      "shortcutName": "JewelMS"
     }
   }
 }
